@@ -1,4 +1,10 @@
+"""
+oscar huerta 
+objetivo: obtener el interes simple co n tasa de CETES en 20 dias 
+haciendo rquest banxico enviado por email de resultados 
+version extendida por sms/wasap si no se conecta por mail 
 
+"""
 import os
 import time
 import requests
@@ -7,6 +13,14 @@ from email.message import EmailMessage
 from dotenv import load_dotenv
 
 load_dotenv()
+"""
+funcion 1) Conexion a Banxico
+funcion 2) Conexion a Banxico series oportuno CETES 
+funcion 3) Calcular interes simple
+funcion 4) Enviar correo con resultados
+funcion 5) Enviar respaldo por sms/wasap
+funcion 6) Menu principal
+"""
 
 TOKEN = os.getenv("TOKEN_BANXICO")
 GMAIL_USER = os.getenv("GMAIL_USER", "oscarhuertamo0408@gmail.com")
@@ -19,14 +33,10 @@ ENLACE_BASE = "https://www.banxico.org.mx/SieAPIRest/service/v1/series"
 DIAS = 20
 BASE_DIAS = 360
 
-estado = {
-    "tasa": None,
-    "fecha": None,
-    "capital": None,
-    "interes": None,
-    "texto": None,
-}
+#Guarda los datos entre las opciones del menu 
+estado = {"tasa": None,"fecha": None,"capital": None,"interes": None,"texto": None,}
 
+#funcion 1) conexion a Banxico, 2) conexion a Banxico Cetes 
 def banxico_cetes() -> tuple[float, str]:
     if not TOKEN:
         raise ValueError("No se encontró TOKEN_BANXICO en el archivo .env")
@@ -43,9 +53,12 @@ def banxico_cetes() -> tuple[float, str]:
 
     return float(dato["dato"]), dato["fecha"]
 
+#funcion 3) calcular interes simple
 def calcular_isc(capital: float, tasa_anual_pct: float, dias: int = DIAS) -> float:
     return capital * (tasa_anual_pct / 100) * (dias / BASE_DIAS)
 
+
+#funcion 4) enviar correo
 def enviar_correo(asunto: str, cuerpo: str) -> None:
     if not GMAIL_PASS:
         raise ValueError("Falta GMAIL_APP_PASSWORD en el .env")
@@ -66,11 +79,13 @@ def enviar_correo(asunto: str, cuerpo: str) -> None:
             "Gmail rechazó el login. Usa una contraseña de aplicación "
             "con verificación en dos pasos activada."
         )
-
+    
+#funcion 5) enviar respaldo por sms/wasap
 def enviar_respaldo(texto: str) -> None:
     print("[Respaldo SMS/WhatsApp]")
     print(texto)
 
+#funcion 6) menu principal 
 def menu_principal() -> None:
     while True:
         print("\nFlujo de Programa")
